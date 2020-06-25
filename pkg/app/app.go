@@ -48,28 +48,32 @@ func (a *App) Run() {
 }
 
 // GET configures a GET route for the path provided
-func (a *App) GET(path string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	a.router.HandleFunc(path, handlerFunc).Methods("GET")
+func (a *App) GET(path string, handler handlerFunction) {
+	buildHandlerFunc(a, path, handler).Methods("GET")
 }
 
 // POST configures a POST route for the path provided
-func (a *App) POST(path string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	a.router.HandleFunc(path, handlerFunc).Methods("POST")
+func (a *App) POST(path string, handler handlerFunction) {
+	buildHandlerFunc(a, path, handler).Methods("POST")
 }
 
 // PUT configures a PUT route for the path provided
-func (a *App) PUT(path string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	a.router.HandleFunc(path, handlerFunc).Methods("PUT")
+func (a *App) PUT(path string, handler handlerFunction) {
+	buildHandlerFunc(a, path, handler).Methods("PUT")
 }
 
 // DELETE configures a DELETE route for the path provided
-func (a *App) DELETE(path string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	a.router.HandleFunc(path, handlerFunc).Methods("DELETE")
+func (a *App) DELETE(path string, handler handlerFunction) {
+	buildHandlerFunc(a, path, handler).Methods("DELETE")
 }
 
 // PATCH configures a PATCH route for the path provided
-func (a *App) PATCH(path string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	a.router.HandleFunc(path, handlerFunc).Methods("PATCH")
+func (a *App) PATCH(path string, handler handlerFunction) {
+	buildHandlerFunc(a, path, handler).Methods("PATCH")
+}
+
+func buildHandlerFunc(a *App, path string, handler handlerFunction) *mux.Route {
+	return a.router.HandleFunc(path, a.Handle(handler))
 }
 
 // Handle takes in a custom handlerFunction and turns it into a handlerFunc which can be understood by our router

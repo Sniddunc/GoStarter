@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app.GET("/api/v1/add", app.Handle(add.Handler))
+	app.GET("/api/v1/add", add.Handler)
 
 	app.Run()
 }
