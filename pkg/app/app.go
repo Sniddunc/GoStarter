@@ -11,9 +11,9 @@ import (
 
 // App is the main struct for our application
 type App struct {
+	config *Config
 	router *mux.Router
 	DB     *sql.DB
-	Host   string
 }
 
 // Config represents the config details required for the app
@@ -21,22 +21,23 @@ type Config struct {
 	DBType       string
 	DBConnString string
 	Host         string
+	DevMode      bool
 }
 
 type handlerFunction func(c *Context)
 
 // CreateApp takes in an Config and returns a configured App
 func CreateApp(config Config) (App, error) {
-	newApp := App{}
-
 	db, err := sql.Open(config.DBType, config.DBConnString)
 	if err != nil {
 		return App{}, err
 	}
 
-	newApp.DB = db
-	newApp.router = mux.NewRouter()
-	newApp.Host = config.Host
+	newApp := App{
+		config: &config,
+		router: mux.NewRouter(),
+		DB:     db,
+	}
 
 	// Set NotFound (404) route handler
 	newApp.router.NotFoundHandler = newApp.Handle(func(c *Context) {
@@ -53,8 +54,13 @@ func CreateApp(config Config) (App, error) {
 
 // Run launches the server and listens for connections
 func (a *App) Run() {
-	fmt.Printf("Server listening on %s\n", a.Host)
-	http.ListenAndServe(a.Host, a.router)
+	fmt.Printf("Server listening on %s\n", a.config.Host)
+	http.ListenAndServe(a.config.Host, a.router)
+}
+
+// DevModeEnabled returns the value of DevMode in the app's config
+func (a *App) DevModeEnabled() bool {
+	return a.config.DevMode
 }
 
 // GET configures a GET route for the path provided
