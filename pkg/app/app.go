@@ -38,6 +38,16 @@ func CreateApp(config Config) (App, error) {
 	newApp.router = mux.NewRouter()
 	newApp.Host = config.Host
 
+	// Set NotFound (404) route handler
+	newApp.router.NotFoundHandler = newApp.Handle(func(c *Context) {
+		c.Writer.WriteHeader(http.StatusNotFound)
+	})
+
+	// Set MethodNotAllowed (405) route handler
+	newApp.router.MethodNotAllowedHandler = newApp.Handle(func(c *Context) {
+		c.Writer.WriteHeader(http.StatusMethodNotAllowed)
+	})
+
 	return newApp, nil
 }
 
