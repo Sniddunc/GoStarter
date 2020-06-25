@@ -1,6 +1,7 @@
 package app
 
 import (
+	"GoStarter/internal/common"
 	"database/sql"
 	"encoding/json"
 	"net/http"
@@ -54,4 +55,23 @@ func (c *Context) SendUnauthorized() {
 	// Send back 401 (Unauthorized)
 	c.Writer.WriteHeader(http.StatusUnauthorized)
 	c.Writer.Write([]byte("Unauthorized"))
+}
+
+// SendBadRequest informs the user that they sent a bad request
+func (c *Context) SendBadRequest(message string, errors interface{}) {
+	// Send back 400 (Bad Request)
+	c.JSON(http.StatusBadRequest, common.StandardResponse{
+		Success: false,
+		Message: message,
+		Errors:  errors,
+	})
+}
+
+// SendInternalError informs the user that an internal server error occurred
+func (c *Context) SendInternalError() {
+	// Send back 500 (Internal Server Error)
+	c.JSON(http.StatusInternalServerError, common.StandardResponse{
+		Success: false,
+		Message: "Something went wrong on our end. Please try again later.",
+	})
 }
