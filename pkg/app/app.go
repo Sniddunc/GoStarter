@@ -12,7 +12,7 @@ import (
 // App is the main struct for our application
 type App struct {
 	config *Config
-	router *mux.Router
+	Router *mux.Router
 	DB     *sql.DB
 }
 
@@ -35,17 +35,17 @@ func CreateApp(config Config) (App, error) {
 
 	newApp := App{
 		config: &config,
-		router: mux.NewRouter(),
+		Router: mux.NewRouter(),
 		DB:     db,
 	}
 
 	// Set NotFound (404) route handler
-	newApp.router.NotFoundHandler = newApp.Handle(func(c *Context) {
+	newApp.Router.NotFoundHandler = newApp.Handle(func(c *Context) {
 		c.Writer.WriteHeader(http.StatusNotFound)
 	})
 
 	// Set MethodNotAllowed (405) route handler
-	newApp.router.MethodNotAllowedHandler = newApp.Handle(func(c *Context) {
+	newApp.Router.MethodNotAllowedHandler = newApp.Handle(func(c *Context) {
 		c.Writer.WriteHeader(http.StatusMethodNotAllowed)
 	})
 
@@ -55,7 +55,7 @@ func CreateApp(config Config) (App, error) {
 // Run launches the server and listens for connections
 func (a *App) Run() {
 	fmt.Printf("Server listening on %s\n", a.config.Host)
-	http.ListenAndServe(a.config.Host, a.router)
+	http.ListenAndServe(a.config.Host, a.Router)
 }
 
 // DevModeEnabled returns the value of DevMode in the app's config
@@ -89,7 +89,7 @@ func (a *App) PATCH(path string, handler handlerFunction) {
 }
 
 func buildHandlerFunc(a *App, path string, handler handlerFunction) *mux.Route {
-	return a.router.HandleFunc(path, a.Handle(handler))
+	return a.Router.HandleFunc(path, a.Handle(handler))
 }
 
 // Handle takes in a custom handlerFunction and turns it into a handlerFunc which can be understood by our router
